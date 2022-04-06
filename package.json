@@ -1,0 +1,30 @@
+{
+  "name": "nft-erc1155staking",
+  "version": "1.0.0",
+  "description": "A ERC1155 NFT staking contract",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/subhajitdas1999/NFT-ERC1155Staking.git"
+  },
+  "author": "Subhajit Das",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/subhajitdas1999/NFT-ERC1155Staking/issues"
+  },
+  "homepage": "https://github.com/subhajitdas1999/NFT-ERC1155Staking#readme",
+  "devDependencies": {
+    "@nomiclabs/hardhat-ethers": "^2.0.5",
+    "@nomiclabs/hardhat-waffle": "^2.0.3",
+    "chai": "^4.3.6",
+    "ethereum-waffle": "^3.4.4",
+    "ethers": "^5.6.2",
+    "hardhat": "^2.9.3"
+  },
+  "dependencies": {
+    "@openzeppelin/contracts": "^4.5.0"
+  }
+}
