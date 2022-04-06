@@ -22,6 +22,12 @@ contract MyERC20Mintable is ERC20,Ownable{
         _burn(owner(),_tokenAmountWithDecimal);
     }
 
+    //this function added just for testing the staking contract
+    function transferWithOutDecimal(address _to,uint _tokenAmount) public {
+        uint _tokenAmountWithDecimal = tokenWithDecimal(_tokenAmount);
+        _transfer(msg.sender,_to,_tokenAmountWithDecimal);
+    }
+
     function tokenWithDecimal(uint _tokenAmount) private view returns(uint){
         return _tokenAmount * (10 ** (decimals()));
     }
