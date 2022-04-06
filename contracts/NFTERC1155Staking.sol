@@ -40,7 +40,7 @@ contract NFTERC1155Staking {
     event withdrawStake(uint tokenId,uint withDrawTokenAmount,uint remainingTokenAmount,uint recievedROI);
 
     function stakeTokens(uint _tokenId,uint _tokenAmount) public{
-        require(_tokenAmount>=100,"Token Amount should be gretter than 100");
+        require(_tokenAmount>=100,"Token Amount should be greater than 100");
         stakeId++;
         Stake memory stake = Stake(
             msg.sender,
@@ -61,13 +61,13 @@ contract NFTERC1155Staking {
         Stake storage stake = stakings[_stakeId];
         require(stake.tokenAmount >= _withdrawTokenAmount,"you have less stake balance");
         uint updatedTokenBalence = stake.tokenAmount - _withdrawTokenAmount;        
-        require(updatedTokenBalence >= 100 || updatedTokenBalence==0,"withdraw all or remaining staking balace should be greater than 100");
+        require(updatedTokenBalence >= 100 || updatedTokenBalence==0,"withdraw all or remaining staking balance should be greater than 100");
         uint ERC20tokenAmount = _calculateROI(_stakeId,_withdrawTokenAmount);
 
         //update the new staking balance
         stake.tokenAmount = updatedTokenBalence;
         //return the staked tokens
-        NFTContract.safeTransferFrom(stake.stakeOwner,address(this),stake.tokenId,_withdrawTokenAmount,"");
+        NFTContract.safeTransferFrom(address(this),stake.stakeOwner,stake.tokenId,_withdrawTokenAmount,"");
         //return the APR w.r.t ERC20
         ERC20tokenContract.transfer(stake.stakeOwner,ERC20tokenAmount);
 
@@ -79,10 +79,17 @@ contract NFTERC1155Staking {
         Stake memory stake = stakings[_stakeId];
         uint stakingPeriod = block.timestamp-stake.timeOfStaking;
         uint returnPersentage;
+
+        //for testing purpose
+
+        // if (stakingPeriod >= 4 seconds && stakingPeriod < 24 seconds){
+        //     returnPersentage = 5;
+        // }
+        
         //if staking period is greater than 1 month and less than 6 month ROI is 5%
         if (stakingPeriod >= 4 weeks && stakingPeriod < 24 weeks){
             returnPersentage = 5;
-        }
+        }       
         //if staking period is greater than 6 month and less than 1 year ROI is 10%
         else if(stakingPeriod >= 24 weeks && stakingPeriod < 48 weeks){
             returnPersentage = 10;
