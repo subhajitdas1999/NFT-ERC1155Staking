@@ -140,7 +140,7 @@ describe("NFTERC1155Staking Contract", () => {
     }
     
     //add delay of 5 seconds
-    console.log("added delay for 5 seconds");
+    console.log("added delay of 5 seconds");
     await delay(5000);
     
     //Now after 5 seconds user should get his reward as mentioned in contract (4 weeks ~ 4 seconds here)
