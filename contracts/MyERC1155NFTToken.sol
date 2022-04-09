@@ -7,7 +7,7 @@ import "@openzeppelin/contracts/access/Ownable.sol";
 
 
 contract MyERC1155NFTToken is ERC1155,Ownable{
-    constructor() ERC1155("https://token-cdn-domain/{id}.json"){
+    constructor() ERC1155("https://sourceOfNFT/{id}.json"){
 
     }
 
