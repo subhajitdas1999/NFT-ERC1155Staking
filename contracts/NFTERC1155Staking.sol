@@ -37,6 +37,7 @@ contract NFTERC1155Staking {
     //event for stake withdraw
     event withdrawStake(uint tokenId,uint withDrawTokenAmount,uint remainingTokenAmount,uint recievedROI);
 
+    //need to call setApproveForAll in NFT contract, before calling this function
     function stakeTokens(uint _tokenId,uint _tokenAmount) public{
         require(NFTContract.balanceOf(msg.sender,_tokenId)>= _tokenAmount,"Account have less token");
         require(NFTContract.isApprovedForAll(msg.sender,address(this)),"Approve this contract as an operator");
