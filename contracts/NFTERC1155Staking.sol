@@ -6,16 +6,14 @@ import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 
 
 contract NFTERC1155Staking {
-    //staking id
-    uint private stakeId;
-
     //NFT contract
     IERC1155 public NFTContract;
+
     //ERC20 token contract
     IERC20 public ERC20tokenContract;
 
-    //ERC20 token decimals
-    uint8 private tokenDecimals = 18;
+    //ERC20 token Decimals
+    uint public ERC20Tokendecimals = 18;
 
     constructor(IERC1155 _NFTContract,IERC20 _ERC20tokenContract){
         NFTContract = _NFTContract;
@@ -32,16 +30,17 @@ contract NFTERC1155Staking {
     }
 
     // mapping staking id => Stake
-    mapping( uint => Stake) public stakings;
+    mapping( address => Stake[]) public stakings;
 
     //event for staking
-    event staked(address indexed staker, uint tokenId, uint tokenAmount,uint stakeId);
+    event staked(address indexed staker, uint tokenId, uint tokenAmount,uint stakeIndex);
     //event for stake withdraw
     event withdrawStake(uint tokenId,uint withDrawTokenAmount,uint remainingTokenAmount,uint recievedROI);
 
     function stakeTokens(uint _tokenId,uint _tokenAmount) public{
-        require(_tokenAmount>=100,"Token Amount should be greater than 100");
-        stakeId++;
+        require(NFTContract.balanceOf(msg.sender,_tokenId)>= _tokenAmount,"Account have less token");
+        require(NFTContract.isApprovedForAll(msg.sender,address(this)),"Approve this contract as an operator");
+        require(_tokenAmount >= 100,"Token Amount should be greater than 100");
         Stake memory stake = Stake(
             msg.sender,
             _tokenId,
@@ -49,20 +48,22 @@ contract NFTERC1155Staking {
             block.timestamp
         );
 
-        stakings[stakeId] = stake;
+        stakings[msg.sender].push(stake);
         NFTContract.safeTransferFrom(stake.stakeOwner,address(this),stake.tokenId,stake.tokenAmount,"");
 
-        //emit the stake event
-        emit staked(msg.sender,_tokenId,_tokenAmount,stakeId);
+        //emit the staked events .latest stake Index should be length of stakes array -1 .
+        emit staked(msg.sender,_tokenId,_tokenAmount,stakings[msg.sender].length - 1);
     }
 
     // withdraw the staked tokens with ERC20 in return
-    function withdrawTokens(uint _stakeId,uint _withdrawTokenAmount) public {
-        Stake storage stake = stakings[_stakeId];
+    function withdrawTokens(uint _stakeIndex,uint _withdrawTokenAmount) public {
+        //check the stake index
+        require(_stakeIndex < stakings[msg.sender].length,"Invalid Index");
+        Stake storage stake = stakings[msg.sender][_stakeIndex];
         require(stake.tokenAmount >= _withdrawTokenAmount,"you have less stake balance");
         uint updatedTokenBalence = stake.tokenAmount - _withdrawTokenAmount;        
         require(updatedTokenBalence >= 100 || updatedTokenBalence==0,"withdraw all or remaining staking balance should be greater than 100");
-        uint ERC20tokenAmount = _calculateROI(_stakeId,_withdrawTokenAmount);
+        uint ERC20tokenAmount = _calculateROI(_stakeIndex,_withdrawTokenAmount);
 
         //update the new staking balance
         stake.tokenAmount = updatedTokenBalence;
@@ -75,34 +76,30 @@ contract NFTERC1155Staking {
         emit withdrawStake(stake.tokenId,_withdrawTokenAmount,stake.tokenAmount,ERC20tokenAmount);
     }
 
-    function _calculateROI(uint _stakeId,uint _tokenAmount) private view returns(uint){
-        Stake memory stake = stakings[_stakeId];
+    function _calculateROI(uint _stakeIndex,uint _tokenAmount) public view returns(uint){
+        Stake memory stake = stakings[msg.sender][_stakeIndex];
         uint stakingPeriod = block.timestamp-stake.timeOfStaking;
         uint returnPersentage;
-
-        //for testing purpose
-
+        //for testing
         // if (stakingPeriod >= 4 seconds && stakingPeriod < 24 seconds){
         //     returnPersentage = 5;
         // }
-        
-        //if staking period is greater than 1 month and less than 6 month ROI is 5%
-        if (stakingPeriod >= 4 weeks && stakingPeriod < 24 weeks){
+        //if staking period is greater than 1 month(30days) and less than 6 month (~183 days) ROI is 5%  
+        if (stakingPeriod >= 30 days && stakingPeriod < 183 days){
             returnPersentage = 5;
-        }       
-        //if staking period is greater than 6 month and less than 1 year ROI is 10%
-        else if(stakingPeriod >= 24 weeks && stakingPeriod < 48 weeks){
+        }
+        //if staking period is greater than 6 month(~183 days) and less than 1 year(365 days) ROI is 10%
+        else if(stakingPeriod >= 183 days && stakingPeriod < 365 days){
             returnPersentage = 10;
         }
         //if staking period is greater than 1 year, ROI is 15%
-        else if(stakingPeriod >= 48 weeks) {
+        else if(stakingPeriod >= 365 days) {
             returnPersentage = 15;
         }
         //erc20 decimal is present,considering it into the calculation 
-        return (10**tokenDecimals * _tokenAmount * returnPersentage)/100 ; 
+        return (10**ERC20Tokendecimals * _tokenAmount * returnPersentage)/100 ; 
 
     }
-
     //we need this function to recieve ERC1155 NFT
     function onERC1155Received(address, address, uint256, uint256, bytes memory) public virtual returns (bytes4) {
         return this.onERC1155Received.selector;
