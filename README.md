@@ -1,14 +1,28 @@
 # ERC1155 staking contract 
 
-this contract helps to stake any ERC1155 NFT . it takes two contract address as constructor argument , one is ERC1155 NFT contract and another is ERC20 token contract (as the staking contract gives ERC20 as a staking reward). you have to approve this (setApproveForAll) this staking contract as a operator to transfer NFTS.
+Description :- This contract helps to stake any ERC1155 NFT . it takes two contract address as constructor argument, one is ERC1155NFT contract and another is ERC20 token contract (as the staking contract gives ERC20 as a staking reward).Minimum amount of NFT you can stake is 100 in this contract. User can stake their ERC1155 token , as a staking reward user will get ERC20 tokens (ROI:- 1month=5%APR,6month = 10% APR , 1Year = 15% APR) .
+
+The staking contract is deployed with some ERC20 tokens. 
+
+
+
+NOTE :- 
+    1. It'll work on any type of ERC20 token, as long as the decimal value is 18.
+    2. Before staking any token first Approve this contract as a operator, otherwise your transaction will be reverted.
 
 # the contracts is deployed at rinkeby network 
 
-1. ERC1155Token contract 0xC733CBb278BDdc5b5847aC7Bd71e40ffa478A905 
+1. ERC1155Token contract 0xC34525E0D7188fdA211D27b349B7364933C3AC89 .
 
-2. ERC20TOken contract 0x51e6077De24ff214f59113a73AB66cd631AaeFbd
+contract verified [etherscan](https://rinkeby.etherscan.io/address/0xC34525E0D7188fdA211D27b349B7364933C3AC89#code) 
 
-3. Staking address 0x26dd4432DD84C88eE80F43FC2361751C54bfa87e . contract verified [etherscan](https://rinkeby.etherscan.io/address/0x83AD0a3056ac20b137347ab74A1c96601510846F#code)
+2. ERC20TOken contract 0xce07a94F963B3f7309BC008f5D729c0d8a349055 .
+
+contract verified [etherscan](https://rinkeby.etherscan.io/address/0xce07a94F963B3f7309BC008f5D729c0d8a349055#code)
+
+3. Staking address 0xa86450AEa8e4cF2Ff9942757eA2382CdD3272948 . 
+
+contract verified [etherscan](https://rinkeby.etherscan.io/address/0xa86450AEa8e4cF2Ff9942757eA2382CdD3272948#code)
 
 # To Deploy the contracts 
 
@@ -20,4 +34,10 @@ for rinkeby network
 
 # To run the tests for staking contract
 
+All the tests for this staking contract written in test/NFTERC1155Staking.js file.
+
+to run the tests,
+
 1. run:- npx hardhat test (from root directory)
+
+NOTE:- Do not forget to change the time period from days to seconds in "_calculateROI" function in NFTERC1155Staking.sol file , otherwise last test will fail
